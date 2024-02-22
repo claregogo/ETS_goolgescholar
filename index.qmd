@@ -78,6 +78,16 @@ totaldata<-page_link%>%
   map_df(.x = ., .f = my_scraping)
 ```
 
+data cleaning
+
+```{r}
+totaldata$title <- str_replace_all(totaldata$title, "\\[.*?\\]", "")
+# replace [] and content inside [] with white space
+totaldata<-totaldata%>%
+  mutate(cite = as.numeric(cite))%>%
+  arrange(desc(cite))
+```
+
 save data
 
 ```{r}
