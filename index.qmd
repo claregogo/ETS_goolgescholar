@@ -77,3 +77,9 @@ data<-tibble(title,cite, link)
 totaldata<-page_link%>%
   map_df(.x = ., .f = my_scraping)
 ```
+
+save data
+
+```{r}
+write_csv(totaldata,file = "/Users/macbookpro/Desktop/r_automation/my_scraping_googleschoolar/ETS_goolgescholar/ets_scholar.csv")
+```
