@@ -1,0 +1,79 @@
+---
+title: "index"
+format: html
+editor: visual
+---
+
+library
+
+```{r}
+library(tidyverse)
+library(rvest)
+```
+
+scprape tilte, link, and cite number
+
+```{r}
+url <- "https://scholar.google.com/scholar?hl=zh-CN&as_sdt=0%2C9&q=emission+trading+scheme&oq=emission+"
+page<-read_html(url)
+
+title<-page%>%
+  html_nodes(".gs_rt")%>%
+  html_text(trim = T)
+
+#class = gs_rt
+#<a id="H5b5vd5nYl8J" href="https://www.sciencedirect.com/science/article/pii/S0301421507003862" data-clk="hl=zh-CN&amp;sa=T&amp;oi=ggp&amp;ct=res&amp;cd=30&amp;d=6873170187688449567&amp;ei=94jWZY-oG4HOy9YPxPy7gAg" data-clk-atid="H5b5vd5nYl8J">Firm performance and employment in the EU <b>emissions trading scheme</b>: An empirical assessment for Germany</a>
+link<-page%>%
+  html_nodes(".gs_rt a")%>%
+  html_attr("href")
+
+cite<- page%>%
+  html_nodes(".gs_flb")%>%
+  html_text(trim = T)%>%
+  str_extract_all(., "\\d+")%>%
+  map_chr(., ~ .x[1])
+
+data<-tibble(title,cite, link)
+
+```
+
+loop pages
+
+```{r}
+page_number<-seq(from = 0, to =100, by = 10)
+page_link<-paste0("https://scholar.google.com/scholar?start=",page_number,"&q=emission+trading+scheme&hl=zh-CN&as_sdt=0,9")
+#cant be extractedt by html_node
+#<a class="gs_nma" href="/scholar?start=10&amp;q=emission+trading+scheme&amp;hl=zh-CN&amp;as_sdt=0,9">2</a>
+
+```
+
+scraping function
+
+```{r}
+my_scraping<-function(y){
+  
+Sys.sleep(time = sample(x = 1:12, size = 1, replace = T))
+cat(".") 
+  
+page<-read_html(y)
+
+title<-page%>%
+  html_nodes(".gs_rt")%>%
+  html_text(trim = T)
+
+link<-page%>%
+  html_nodes(".gs_rt a")%>%
+  html_attr("href")
+
+cite<- page%>%
+  html_nodes(".gs_flb")%>%
+  html_text(trim = T)%>%
+  str_extract_all(., "\\d+")%>%
+  map_chr(., ~ .x[1])
+
+data<-tibble(title,cite, link)
+}
+
+totaldata<-page_link%>%
+  map_df(.x = ., .f = my_scraping)
+```
